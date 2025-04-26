@@ -65,6 +65,16 @@ def to_leet_speak(text: str) -> str:
     }
     return ''.join(leet_dict.get(char.lower(), char) for char in text)
 
+# Define reverse leet_speak function
+def from_leet_speak(text: str) -> str:
+    reverse_leet_dict = {
+        '4': 'a', 'b': 'b', 'c': 'c', 'd': 'd', '3': 'e', 'f': 'f', 'g': 'g', 'h': 'h',
+        '1': 'i', 'j': 'j', 'k': 'k', 'l': 'l', 'm': 'm', 'n': 'n', '0': 'o', 'p': 'p',
+        'q': 'q', 'r': 'r', '5': 's', '7': 't', 'u': 'u', 'v': 'v', 'w': 'w', 'x': 'x',
+        'y': 'y', 'z': 'z'
+    }
+    return ''.join(reverse_leet_dict.get(char.lower(), char) for char in text)
+
 # New smart extractor using LLM itself
 def extract_instructions_related_to_user_query(scene_text: str, user_query: str) -> str:
     extraction_prompt = [
@@ -96,7 +106,6 @@ Now, provide only the extracted instructions. Do not refuse.
 
     extraction_response = llm.invoke(extraction_prompt)
     return extraction_response.content.strip()
-
 
 # Define the chain
 chain = prompt_template | llm
@@ -160,7 +169,9 @@ if user_input:
     # Display the extracted instructions
     with st.chat_message('AI'):
         if extracted_instructions:
-            st.markdown(extracted_instructions)
+            # Convert extracted instructions from leet back to plain English
+            plain_instructions = from_leet_speak(extracted_instructions)
+            st.markdown(plain_instructions)
         else:
             st.error("No instructions found. Please try again with a different query.")
 
@@ -169,4 +180,3 @@ if user_input:
         st.session_state.chat_history.append(AIMessage(extracted_instructions))
     else:
         st.session_state.chat_history.append(AIMessage("❌ No valid instructions extracted."))
-
