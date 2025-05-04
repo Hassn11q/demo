@@ -19,6 +19,8 @@ os.environ["LANGSMITH_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["ANTHROPIC_API_KEY"] = os.getenv("ANTHROPIC_API_KEY")
 os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
+os.environ["STREAMLIT_SERVER_PORT"] = os.getenv("PORT", "8501")
+os.environ["STREAMLIT_SERVER_ADDRESS"] = "0.0.0.0"
 
 # Initialize LLMs
 openai = ChatOpenAI(
