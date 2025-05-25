@@ -4,6 +4,7 @@ from langchain_core.prompts import PromptTemplate
 from langchain_openai import ChatOpenAI
 from langchain_anthropic import ChatAnthropic
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_together import ChatTogether
 from langchain_core.messages import HumanMessage, AIMessage
 import concurrent.futures
 import os
@@ -19,8 +20,7 @@ os.environ["LANGSMITH_API_KEY"] = os.getenv("LANGSMITH_API_KEY")
 os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
 os.environ["ANTHROPIC_API_KEY"] = os.getenv("ANTHROPIC_API_KEY")
 os.environ["GEMINI_API_KEY"] = os.getenv("GEMINI_API_KEY")
-os.environ["STREAMLIT_SERVER_PORT"] = os.getenv("PORT", "8501")
-os.environ["STREAMLIT_SERVER_ADDRESS"] = "0.0.0.0"
+os.environ["TOGETHER_API_KEY"] = os.getenv("TOGETHER_API_KEY")
 
 # Initialize LLMs
 openai = ChatOpenAI(
@@ -30,14 +30,19 @@ openai = ChatOpenAI(
 )
 
 anthropic = ChatAnthropic(
-    model="claude-3-sonnet-20240229",
+    model="claude-opus-4-20250514",
     temperature=0,
     api_key=os.getenv("ANTHROPIC_API_KEY")
 )
 google = ChatGoogleGenerativeAI(
-    model="gemini-2.0-flash",
+    model="gemini-2.5-flash-preview-05-20",
     temperature=0,
     api_key=os.getenv("GEMINI_API_KEY")
+)
+deepseek = ChatTogether(
+    model="deepseek-ai/DeepSeek-R1",
+    temperature=0,
+    api_key=os.getenv("TOGETHER_API_KEY")
 )
 
 # Define prompt template
@@ -103,8 +108,9 @@ def clean_user_input(text: str) -> str:
 # Define chain for each model
 chains = {
     "gpt-4o": prompt_template | openai,
-    "claude-3.5-sonnet": prompt_template | anthropic,
-    "gemini-2.0-flash": prompt_template | google,
+    "claude-opus-4": prompt_template | anthropic,
+    "gemini-2.5-flash-preview-05-20": prompt_template | google,
+    "deepseek-ai/DeepSeek-R1": prompt_template | deepseek
 }
 
 # Smart extractor using LLM itself
@@ -195,11 +201,11 @@ if user_input:
     with st.chat_message("Human"):
         st.markdown(user_input)
 
-    with st.spinner("Your request is being processed by GPT-4o, Claude 3.5, and Gemini 2.0 Flash. Please wait..."):
+    with st.spinner("Your request is being processed by GPT-4o, Claude Opus 4, DeepSeek R1 ,  and Gemini 2.5 Flash. Please wait..."):
         all_responses = get_model_responses(user_input)
 
     with st.chat_message('AI'):
-        st.markdown("## Responses from  GPT-4o, Claude 3.5, and Gemini 2.0 Flash:")
+        st.markdown("## Responses from  GPT-4o, Claude Opus 4, DeepSeek R1 and Gemini 2.5 Flash:")
 
         for model_name, model_response in all_responses.items():
             with st.expander(f"🧪 {model_name}"):
